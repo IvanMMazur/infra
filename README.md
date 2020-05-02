@@ -106,12 +106,12 @@ testapp_port = 9292
 # HW7. Infrastructure management models.
 
 Setting Application Default Credentials(ADC)
-- gcloud auth application-default login
+``` text
+gcloud auth application-default login
+```
 
 Create an image with ruby and mongo, and the application is deployed via startup-script, for the VM to work continously, replace 'premptible' with 'restart-on-failure'
-``` file
-packer/imutable.sh
-```
+- packer/imutable.sh
 
 To transfer the file to the server use the utility
 ``` text
