@@ -1,0 +1,80 @@
+#terraform {
+#    required_version = ">=0.11,<0.12"
+#}
+provider "google" {
+    version = "2.0.0"
+    
+    # Project id
+    project = "hamster-2020"
+    region = "europe-west1"
+}
+
+resource "google_compute_firewall" "firewall_puma" {
+    name    = "allow-puma-default"
+
+    # Name of the natwork in which the rule applies
+    network = "default"
+
+    # What access to allow
+    allow {
+        protocol = "tcp"
+        ports    = ["9292"]
+    }
+
+    # What addresses are allowed access
+    source_ranges = ["0.0.0.0/0"]
+
+    # The rule applies to instances with the listed tags
+    target_tags   = ["reddit-app"]
+}
+
+resource "google_compute_project_metadata" "default" {
+    metadata {
+        #path to public key
+        ssh-keys = "ivanmazur@debian:${file("~/.ssh/ivanmazur.pub")}"
+    }
+}
+
+resource "google_compute_instance" "app" {
+    name            = "reddit-app"
+    machine_type    = "g1-small"
+    zone            = "europe-west1-b"
+    
+    metadata {
+        ssh-keys = "ivanmazur@debian:${file("~/.ssh/ivanmazur.pub")}"
+    }
+    # Boot disk definition
+    boot_disk {
+        initialize_params {
+            image = "reddit-base-1589735657"
+        }
+    }
+
+    tags = ["reddit-app"]
+    
+    # Network interface definition
+    network_interface {
+        
+        # Network to which this interface is connected
+        network = "default"
+
+        # Use ephemeral IP to access from the internet
+        access_config {}
+    }
+
+ connection {
+    type    = "ssh"
+    user    = "ivanmazur"
+    agent   = false
+
+    # Private key path
+    private_key = "ivanmazur@debian:${file("~/.ssh/ivanmazur")}"
+ }
+ provisioner "file" {
+    source      = "files/puma.service"
+    destination = "/tmp/puma.service"
+ }
+ provisioner "remote-exec" {
+    script = "files/deploy.sh"
+ }
+}

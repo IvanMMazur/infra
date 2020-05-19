@@ -103,7 +103,7 @@ testapp_IP = 34.66.131.215
 testapp_port = 9292
 ```
 
-# HW7. Infrastructure management models.
+## HW7. Infrastructure management models.
 
 Setting Application Default Credentials(ADC)
 ``` text
@@ -120,3 +120,98 @@ To transfer the file to the server use the utility
 
 Start instance from the baked image
 - config-sh/create-puma-vm.sh
+
+## HW8. Infrastructure as a Code (IaC).
+
+- Note: git is already installed in standard Ubuntu images.
+- Renoved ivanmazur SSH key from Compute Engine - Metadata - SSH keys
+- Installed Terraform 0.11.11
+- Added **terraform-related** exceptions to **.gitignore**
+- **main.tf** added description of GCP provider
+- Initialized Terraform modules `cd terraform && terraform init`
+- **google_compute_instance** resource added for **main.tf** to create vm in GCP
+- Validation of planned changes of `terraform plan`
+- Applied planned changes to `terraform apply`
+- Obtained th IP address of the instance from the tfstate file `terraform show | grep nat_ip`
+- An attempt was made to connect to the instance via SSH `ssh ivanmazur@1.1.1.1`, connection failed
+- In **main.tf**, the metadata section containing the path to the public key has been added to the resource description
+
+<details>
+    <summary>ssh metadata</summary>
+
+```bash
+metadata {
+    ssh-keys = "ivanmazur:${file("~/.ssh/ivanmazur.pub")}"
+}
+```
+
+</details>
+
+- Changes checked and applied to the instance of `terraform plan && terraform apply -auto-approve`
+- Checked connection to the instance via SSH, the connection was successful
+- Added file of output variables **outputs.tf**
+- Added output variable app_external_ip `google_compute_instance.app.network_interface.0.access_config.0.nat_ip`
+- The value of the variable is obtained after executing `terraform refresh` and `terraform output`
+- Added desctiption of google_compute_firewall resource creating a rule that allows access to port 9292
+- Changes applied, created rule for firewall in GCP
+- Added tag `tags = ["reddit-app"]` for instance **google_compute_instance.app**
+
+### Provisioners
+
+- For resource **google_compute_instance.app** added provisioner of type file, which will copy the file from the local machine to the created instance
+
+<details>
+    <summary>file provisioner</summary>
+
+```ruby
+provisioner "file" {
+    source = "files/puma.service"
+    destination = "/tmp/puma.service"
+}
+```
+
+</details>
+
+- For resource **google_compute_instance.app** added provisioner of type remote_exec, which will run bash-script on the created instance
+
+<details>
+    <summary>remote_exec provisioner</summary>
+
+```ruby
+provisioner "remote-exec" {
+    script = "file/deploy.sh"
+}
+```
+
+</details>
+
+- Inside the resource description **google_compute_instance.app** added section connection, which determines the connection parameters to the instance for launching provisioning
+
+<details>
+    <summary>provisioner connection</summary>
+
+```ruby
+  connection {
+    type  = "ssh"
+    user  = "ivanmazur"
+    agent = false
+
+    # Private key path
+    private_key = "${file(var.private_key_path)}"
+  }
+```
+
+
+</details>
+
+- Because Provisionaries are launched only when a new resource is created (or when deleted), then, to execute provisioning sections, the resource **google_compute_instance.app** is marked for re-creation when the following changes are applied: `terraform taint google_compute_instance.app`
+- After applying the changes, you can make sure that the reddit application is available at <http://your-vm-ip:9292>
+
+### Input Vars
+
+- Added file under input vars - **variables.tf**
+- Added variables to the terraform variables file: project, region, public_key_path, disk_image
+- In the file **main.tf** the values of the parameters project, region, public_key_path. disk_image changed to variables
+- The values of variables that do not have a default value are defined in the **terraform.tfvars** file
+- The infrastructure was recreated by executing the commands `terrafrm destroy -auto-approve && terraform plan && terraform apply -auto-approve`
+- After re-creating the application, it is available at <http://your-vm-ip:9292>
