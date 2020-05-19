@@ -102,3 +102,21 @@ testapp_IP = 34.66.131.215
 
 testapp_port = 9292
 ```
+
+# HW7. Infrastructure management models.
+
+Setting Application Default Credentials(ADC)
+``` text
+gcloud auth application-default login
+```
+
+Create an image with ruby and mongo, and the application is deployed via startup-script, for the VM to work continously, replace 'premptible' with 'restart-on-failure'
+- packer/imutable.sh
+
+To transfer the file to the server use the utility
+``` text
+- scp /opt/file.file root@11.22.33.44:/home/user
+```
+
+Start instance from the baked image
+- config-sh/create-puma-vm.sh
