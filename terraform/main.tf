@@ -1,77 +1,34 @@
-provider "google" {
-  version = "2.0.0"
+# provider "google" {
+#   version = "2.0.0"
 
-  # Project id
-  #project = "hamster-2020"
-  project = "${var.project}"
+#   # Project id
+#   #project = "hamster-2020"
+#   project = "${var.project}"
 
-  #region = "europe-west1"
-  region = "${var.region}"
-}
+#   #region = "europe-west1"
+#   region = "${var.region}"
+# }
 
-resource "google_compute_instance" "app" {
-  name         = "reddit-app"
-  machine_type = "g1-small"
-  zone         = "europe-west1-b"
+# resource "google_compute_firewall" "firewall_ssh" {
+#   name = "default-allow-ssh"
 
-  tags = ["reddit-app"]
+#   # Name of the natwork in which the rule applies
+#   network = "default"
 
-  metadata {
-    #sshKeys = "ivanmazur:${file("~/.ssh/ivanmazur.pub")}"
-    sshKeys = "ivanmazur:${file(var.public_key_path)}"
-  }
+#   # What access to allow
+#   allow {
+#     protocol = "tcp"
+#     ports    = ["22"]
+#   }
 
-  # Boot disk definition
-  boot_disk {
-    initialize_params {
-      #image = "reddit-base-1589735657"
-      image = "${var.disk_image}"
-    }
-  }
+#   # What addresses are allowed access
+#   source_ranges = ["0.0.0.0/0"]
+# }
 
-  # Network interface definition
-  network_interface {
-    # Network to which this interface is connected
-    network = "default"
+# resource "google_compute_address" "app_ip" {
+#   name = "reddit-app-ip"
+# }
 
-    # Use ephemeral IP to access from the internet
-    access_config {}
-  }
-
-  connection {
-    type  = "ssh"
-    user  = "ivanmazur"
-    agent = false
-
-    # Private key path
-    private_key = "${file(var.private_key_path)}"
-  }
-
-  provisioner "file" {
-    source      = "files/puma.service"
-    destination = "/tmp/puma.service"
-  }
-
-  provisioner "remote-exec" {
-    script = "files/deploy.sh"
-  }
-}
-
-resource "google_compute_firewall" "firewall_puma" {
-  name = "allow-puma-default"
-
-  # Name of the natwork in which the rule applies
-  network = "default"
-
-  # What access to allow
-  allow {
-    protocol = "tcp"
-    ports    = ["9292"]
-  }
-
-  # What addresses are allowed access
-  source_ranges = ["0.0.0.0/0"]
-
-  # The rule applies to instances with the listed tags
-  target_tags = ["reddit-app"]
-}
+# resource "google_compute_instance" "app" {
+  
+# }
