@@ -1,34 +1,76 @@
-# provider "google" {
-#   version = "2.0.0"
+terraform {
+  required_varsion = "0.11.14"
+}
 
-#   # Project id
-#   #project = "hamster-2020"
-#   project = "${var.project}"
+provider "google" {
+  version = "2.0.0"
 
-#   #region = "europe-west1"
-#   region = "${var.region}"
-# }
+  # Project id
+  project = "keen-ripsaw-278820"
+  project = "${var.project}"
 
-# resource "google_compute_firewall" "firewall_ssh" {
-#   name = "default-allow-ssh"
+  #region = "europe-west1"
+  region = "${var.region}"
+}
 
-#   # Name of the natwork in which the rule applies
-#   network = "default"
+resource "google_compute_project_metadata" "default" {
+  metadata {
+    ssh-keys = "appuser1:${file(var.public_key_path)} appuser2:${file(var.public_key_path)}"
+  }
+}
 
-#   # What access to allow
-#   allow {
-#     protocol = "tcp"
-#     ports    = ["22"]
-#   }
+resource "google_compute_instance" "app" {
+  name         = "reddit-app"
+  machine_type = "g1-small"
+  zone         = "europe-west1-b"
 
-#   # What addresses are allowed access
-#   source_ranges = ["0.0.0.0/0"]
-# }
+  boot_disk {
+    initialize_params {
+      image = "${var.disk_image}"
+    }
+  }
 
-# resource "google_compute_address" "app_ip" {
-#   name = "reddit-app-ip"
-# }
+  metadata {
+    ssh-keys = "ivanmazur:${file(var.public_key_path)}"
+  }
 
-# resource "google_compute_instance" "app" {
-  
-# }
+  tags = ["reddit-app"]
+
+  network_interface {
+    network       = "default"
+    access_config = {}
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "ivanmazur"
+    agent       = false
+    private_key = "${file(var.private_key_path)}"
+  }
+
+  provisioner "file" {
+    source      = "files/puma.service"
+    destination = "/tmp/puma.service"
+  }
+
+  provisioner "remote-exec" {
+    script = "files/deploy.sh"
+  }
+}
+
+resource "google_compute_firewall" "firewall_puma" {
+  name = "allow-puma-default"
+
+  # Name of the natwork in which the rule applies
+  network = "default"
+
+  # What access to allow
+  allow {
+    protocol = "tcp"
+    ports    = ["9292"]
+  }
+
+  # What addresses are allowed access
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["reddit-app"]
+}
