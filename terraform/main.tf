@@ -1,12 +1,22 @@
+terraform {
+  required_varsion = "0.11.14"
+}
+
 provider "google" {
   version = "2.0.0"
 
   # Project id
-  #project = "hamster-2020"
+  project = "keen-ripsaw-278820"
   project = "${var.project}"
 
   #region = "europe-west1"
   region = "${var.region}"
+}
+
+resource "google_compute_project_metadata" "default" {
+  metadata {
+    ssh-keys = "appuser1:${file(var.public_key_path)} appuser2:${file(var.public_key_path)}"
+  }
 }
 
 resource "google_compute_instance" "app" {
@@ -14,36 +24,27 @@ resource "google_compute_instance" "app" {
   machine_type = "g1-small"
   zone         = "europe-west1-b"
 
-  tags = ["reddit-app"]
-
-  metadata {
-    #sshKeys = "ivanmazur:${file("~/.ssh/ivanmazur.pub")}"
-    sshKeys = "ivanmazur:${file(var.public_key_path)}"
-  }
-
-  # Boot disk definition
   boot_disk {
     initialize_params {
-      #image = "reddit-base-1589735657"
       image = "${var.disk_image}"
     }
   }
 
-  # Network interface definition
-  network_interface {
-    # Network to which this interface is connected
-    network = "default"
+  metadata {
+    ssh-keys = "ivanmazur:${file(var.public_key_path)}"
+  }
 
-    # Use ephemeral IP to access from the internet
-    access_config {}
+  tags = ["reddit-app"]
+
+  network_interface {
+    network       = "default"
+    access_config = {}
   }
 
   connection {
-    type  = "ssh"
-    user  = "ivanmazur"
-    agent = false
-
-    # Private key path
+    type        = "ssh"
+    user        = "ivanmazur"
+    agent       = false
     private_key = "${file(var.private_key_path)}"
   }
 
@@ -71,7 +72,5 @@ resource "google_compute_firewall" "firewall_puma" {
 
   # What addresses are allowed access
   source_ranges = ["0.0.0.0/0"]
-
-  # The rule applies to instances with the listed tags
-  target_tags = ["reddit-app"]
+  target_tags   = ["reddit-app"]
 }
