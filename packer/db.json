@@ -1,0 +1,36 @@
+{
+    "variables": {
+        "my_project_id": null,
+        "my_image_description": "reddit-db-base",
+        "my_source_image_family": null,
+        "my_machine_type": null,
+        "my_disk_size": null,
+        "my_disk_type": null,
+        "my_zone": null,
+        "my_net_tags": null
+    },
+    "builders": [
+        {
+            "type": "googlecompute",
+            "project_id": "{{ user `my_project_id` }}",
+            "disk_size": "{{ user `my_disk_size` }}",
+            "disk_type": "{{ user `my_disk_type` }}",
+            "image_description": "{{ user `my_image_description` }}",
+            "image_name": "reddit-base-{{timestamp}}",
+            "image_family": "reddit-base",
+            "source_image_family": "{{ user `my_source_image_family` }}",
+            "zone": "{{ user `my_zone` }}",
+            "network": "default",
+            "tags": "{{ user `my_net_tags` }}",
+            "ssh_username": "ivanmazur",
+            "machine_type": "{{ user `my_machine_type` }}"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "script": "scripts/install_mongodb.sh",
+            "execute_command": "sudo {{.Path}}"
+        }
+    ]
+}
