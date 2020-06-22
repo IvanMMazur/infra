@@ -6,11 +6,30 @@ provider "google" {
   version = "2.0.0"
 
   # Project id
-  project = "keen-ripsaw-278820"
+  # project = "keen-ripsaw-278820"
   project = "${var.project}"
 
   #region = "europe-west1"
   region = "${var.region}"
+}
+
+module "app" {
+  source          = "../modules/app"
+  public_key_path = "${var.public_key_path}"
+  zone            = "${var.zone}"
+  app_disk_image  = "${var.app_disk_image}"
+}
+
+module "db" {
+  source          = "../modules/db"
+  public_key_path = "${var.public_key_path}"
+  zone            = "${var.zone}"
+  db_disk_image   = "${var.db_disk_image}"
+}
+
+module "vpc" {
+  source        = "../modules/vpc"
+  source_ranges = ["37.30.16.236/32"]
 }
 
 # resource "google_compute_project_metadata" "default" {
@@ -19,11 +38,13 @@ provider "google" {
 #   }
 # }
 
+
 # resource "google_compute_instance" "app" {
 #   name         = "reddit-app"
 #   machine_type = "g1-small"
 #   zone         = "europe-west1-b"
 #   tags = ["reddit-app"]
+
 
 #   boot_disk {
 #     initialize_params {
@@ -31,9 +52,11 @@ provider "google" {
 #     }
 #   }
 
+
 #   metadata {
 #     ssh-keys = "ivanmazur:${file(var.public_key_path)}"
 #   }
+
 
 #   connection {
 #     type        = "ssh"
@@ -41,6 +64,7 @@ provider "google" {
 #     agent       = false
 #     private_key = "${file(var.private_key_path)}"
 #   }
+
 
 #   network_interface {
 #     network = "default"
@@ -53,20 +77,25 @@ provider "google" {
 #     destination = "/tmp/puma.service"
 #   }
 
+
 #   provisioner "remote-exec" {
 #     script = "files/deploy.sh"
 #   }
 # }
 
+
 # resource "google_compute_address" "app_ip" {
 #   name = "reddit-app-ip"
 # }
 
+
 # resource "google_compute_firewall" "firewall_puma" {
 #   name = "allow-puma-default"
 
+
 #   # Name of the natwork in which the rule applies
 #   network = "default"
+
 
 #   # What access to allow
 #   allow {
@@ -74,19 +103,24 @@ provider "google" {
 #     ports    = ["9292"]
 #   }
 
+
 #   # What addresses are allowed access
 #   source_ranges = ["0.0.0.0/0"]
 #   target_tags   = ["reddit-app"]
 # }
 
+
 # resource "google_compute_firewall" "firewall_ssh" {
 #   name = "default-allow-ssh"
 #   network = "default"
+
 
 #   allow {
 #     protocol = "tcp"
 #     ports = ["22"]
 #   }
 
+
 #   source_ranges = ["0.0.0.0/0"]
 # }
+

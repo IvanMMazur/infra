@@ -17,7 +17,7 @@
             "disk_type": "{{ user `my_disk_type` }}",
             "image_description": "{{ user `my_image_description` }}",
             "image_name": "reddit-base-{{timestamp}}",
-            "image_family": "reddit-base",
+            "image_family": "reddit-db-base",
             "source_image_family": "{{ user `my_source_image_family` }}",
             "zone": "{{ user `my_zone` }}",
             "network": "default",
