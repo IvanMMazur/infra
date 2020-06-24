@@ -1,6 +1,6 @@
 
 Infra repository
-# HW5. Introduction in GCP
+# 5. Introduction in GCP
 
 IP addresses of virtual machines:
 
@@ -54,7 +54,7 @@ I made sure that it is possible to connect someinternalhost via int.IP
 
 Add cetrtificates letsencrypt
 
-# HW6. Main services GCP
+# 6. Main services GCP
 
 Installation GCP according to the instructions
 - https://cloud.google.com/sdk/docs/
@@ -103,7 +103,7 @@ testapp_IP = 34.66.131.215
 testapp_port = 9292
 ```
 
-## HW7. Infrastructure management models.
+## 7. Infrastructure management models.
 
 Setting Application Default Credentials(ADC)
 ``` text
@@ -121,7 +121,7 @@ To transfer the file to the server use the utility
 Start instance from the baked image
 - config-sh/create-puma-vm.sh
 
-## HW8. Infrastructure as a Code (IaC).
+## 8. Infrastructure as a Code (IaC).
 
 - Note: git is already installed in standard Ubuntu images.
 - Renoved ivanmazur SSH key from Compute Engine - Metadata - SSH keys
@@ -215,3 +215,26 @@ provisioner "remote-exec" {
 - The values of variables that do not have a default value are defined in the **terraform.tfvars** file
 - The infrastructure was recreated by executing the commands `terrafrm destroy -auto-approve && terraform plan && terraform apply -auto-approve`
 - After re-creating the application, it is available at <http://your-vm-ip:9292>
+
+
+## 9. The principles of organization of infrastructure code and work on infrastructure in a team using the example of Terraform
+
+- In **main.tf** added **google_compute_firewall.firewall_ssh** to create an access rule on port 22
+- An error occured while trying to execute `terraform apply` since a rule with such parameters already exists in GCP
+- Existion rule information **default-allow-ssh** added to state terraform `terraform import google_compute_firewall.firewall_ssh default-allow-ssh`
+- In **main.tf** added resource **google_compute_address.app_ip**
+- For the created application instance, ip_address is defined as a link to the created resource `nat_ip ="${google_comopute_address.app_ip.address}"`
+
+### Resource structuring
+
+- Using Packer prepared **reddit-app-base** and **reddit-db-base** images
+- Created new **add.tf** files with a description of resources for an instance with an application and **db.tf** with a description of resources for an instance with MongoDB
+- Created **vpc.tf** with description of resources appplicable for all instances
+- Changes planned and successfully applied
+
+### Modules
+
+- Based on **app.tf**, **db.tf** created Terraform modules
+- Added sections for calling app and db modules to **main.tf**
+- Modules loaded into Terraform cache (.terraform) `terraform get`
+- In **terraform/outputs.tf** the output app_external_ip has been changed to a variable obtained from the app module `value="${module.app.app_external_ip}"`
