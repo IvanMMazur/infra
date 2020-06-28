@@ -5,9 +5,9 @@ Infra repository
 IP addresses of virtual machines:
 
 ``` text
-<10.128.0.2 - someinternalhost_ip>
-<10.128.0.3 - bastion_internal_ip>
-<35.239.44.197 - bastion_ip>
+someinternalhost_ip>
+bastion_internal_ip>
+bastion_ip>
 ```
 Connectiong to the bastion using SSH Agent Forwarding
 
@@ -238,3 +238,67 @@ provisioner "remote-exec" {
 - Added sections for calling app and db modules to **main.tf**
 - Modules loaded into Terraform cache (.terraform) `terraform get`
 - In **terraform/outputs.tf** the output app_external_ip has been changed to a variable obtained from the app module `value="${module.app.app_external_ip}"`
+
+## 10 - Configuration management. Basic DevOps tools. Introducing Ansible
+
+- Installed Ansible
+
+<details>
+    <summary>ansible --version</summary>
+
+```bash
+ansible 2.9.10
+  config file = /home/ivanmazur/CICD/infra/ansible/ansible.cfg
+  configured module search path = [u'/home/ivanmazur/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /home/ivanmazur/.local/lib/python2.7/site-packages/ansible
+  executable location = /home/ivanmazur/.local/bin/ansible
+  python version = 2.7.16 (default, Oct 10 2019, 22:02:15) [GCC 8.3.0]
+```
+
+</details>
+
+- Stage infrastructure deployed bia Terraform
+- Created inventory **ansible/inventory** with a description of the appserver machine
+- Checked the ability to connect ansible to the appserver host
+
+<details>
+    <summary> ansible appserver -m ping -i inventory</summary>
+
+```bash
+appserver | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    }, 
+    "changed": false, 
+    "ping": "pong"
+}
+```
+</detaile>
+
+- The dbserver host has been added to ansible/inventory, the ability to connect Ansible to the dbserver host `ansible dbserver -m ping -i inventory` has been verified
+- Configured ansible.cfg
+- Receined data about uptime of the database server `ansible dbserver -m command -a uptime`
+- In the inventory added host groups app and db
+- Added yaml-inventory, checked abailability of hosts in groups
+- The operation of shell and command modules was investigated
+- Investigated the operation of systemd and service modules
+- Investigated the operation of the git module in comparison with the command module
+- Added clone.yml playbook
+- Result of the launch
+
+<details>
+    <summary>ansible-playbook clone.yml</summary>
+
+```bash
+PLAY [Clone] ***************************************************************************
+
+TASK [Gathering Facts] *****************************************************************
+ok: [appserver]
+
+TASK [Clone repo] **********************************************************************
+changed: [appserver]
+
+PLAY RECAP *****************************************************************************
+appserver                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
+```
+</details>
