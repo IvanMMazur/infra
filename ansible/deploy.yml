@@ -1,0 +1,21 @@
+---
+- name: Configure deploy application # <-- description
+  hosts: app # <-- to which hosts will be performed task
+  become: true
+  tasks: # <-- block of tasks that will be performed for these hosts
+
+    - name: Fetch the latest version of application code
+      git:
+        repo: 'https://github.com/express42/reddit.git'
+        dest: /home/ivanmazur/reddit
+        version: monolith
+      notify: reload puma
+    
+    - name: bundle install
+      bundler:
+        state: present
+        chdir: /home/ivanmazur/reddit # <-- in which directory execute the command
+    
+  handlers:
+  - name: reload puma
+    systemd: name=puma state=restarted

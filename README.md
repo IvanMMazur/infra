@@ -302,3 +302,51 @@ PLAY RECAP *********************************************************************
 appserver                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
 ```
 </details>
+
+## 11 - Deploy and configuration management with Ansible
+
+- Commented out provisioning code for Terraform modules
+
+### One playbook, one script
+
+- Added `*.retry` to .gitignore
+- Added a script to the reddit-app.yml playbook for configuring MongoDB using a configuration file template and a separate db-tag
+- Added jinja template for mongodb - mongod.conf.j2
+- AnsibleUndefinedVariable error `ansible-playbook reddit_app.yml --check --limin db` was detected during the test run of the playbook
+- Added value of mongo_bind_ip variable to playbook, re-check was successful
+- Added handler restart mongod to the playbook, which restarts the service if changes were made
+- Playbook applied successfully
+
+### Setting up an application instance
+
+- Added unit-file puma.service
+- Added tasks to the script for copying the puma.service unit file to the host and puma autorun
+- Added handler to restart puma.service
+- Added template for conf file puma.service
+- Added a task for copying a template with a parameter for db connection
+- Added db_host parameter to script
+- Applied changes added to playbook `ansible-playbook reddit_app.yml --limit app --tags app-tag`
+
+### Deploy
+
+- Added tasks for cloning the reddit repository and installing dependencies via bundle install, tasks are marked with the deploy-tag tag
+- Applide the changes described in the tasks with the deploy-tag
+- Checked the availability of the application in the browser
+
+### One playbook, multiple scripts
+
+- Created a new playbook reddit_app2.yml
+- All tasks related to setting up MongoDB have been moved to a new playbook in a separate play
+- Tasks related to setting up the application have been moved to a new playbook in a sepatate play
+- Rebuilt infrastructure `terraform destroy -auto-approve && terraform apply -auto-approve`
+- Scripts applied to updated infrastructure `ansible-playbook reddit_app2.yml --tags db-tag` and `ansible-playbook reddit_app2.yml --tags app-tag`
+- Added a script (tasks) for application deployment to the playbook reddit_app2.yml
+- The application is deployed by running the playbook `ansible-playbook reddit_app2.yml --tags deploy-tag`
+
+### Multiple playbooks
+
+- Added new app.yml, db.yml, deploy.yml playbooks, reddit_app.yml and reddit_app2.yml playbooks renamed
+- Scripts are split into separate playbooks
+- Created a common site.yml playbook, into which the app, db, deploy playbooks are imported
+- Checked the work of the playbook site.yml on clean infrastructure
+

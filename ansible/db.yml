@@ -1,0 +1,17 @@
+---
+- name: Configure MongoDB # <-- description
+  hosts: db # <-- to which hosts will be performed task
+  become: true # <-- run as root
+  vars:
+    mongo_bind_ip: 0.0.0.0
+  tasks: # <-- block of tasks that will be performed for these hosts
+    - name: Change mongo config file
+      template:
+        src: templates/mongod.conf.j2
+        dest: /etc/mongod.conf
+        mode: 0644 # <-- file permissions to install
+      notify: restart mongod
+      
+  handlers:
+  - name: restart mongod
+    service: name=mongod state=restarted
