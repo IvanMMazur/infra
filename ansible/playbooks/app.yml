@@ -1,0 +1,7 @@
+---
+- name: Configure App # <-- description
+  hosts: app # <-- to which hosts will be performed task
+  become: true # <-- run as root
+  roles:
+    - app
+    - jdauphant.nginx

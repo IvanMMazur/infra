@@ -1,0 +1,6 @@
+---
+- name: Configure MongoDB # <-- description
+  hosts: db # <-- to which hosts will be performed task
+  become: true # <-- run as root
+  roles:
+    - db

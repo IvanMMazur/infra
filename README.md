@@ -19,7 +19,7 @@ alias from .bashrc
         35.239.44.197 ssh ivanmazur@10.128.0.2\"">> ~/.bashrc
     source ~/.bashrc
 ```
-Using aliases in ~/.ssh/config I DONT UNDERSTAND
+Using aliases in ~/.ssh/config
 ``` text
 # for bastion
 Host otus-bastion
@@ -350,3 +350,37 @@ appserver                  : ok=2    changed=1    unreachable=0    failed=0    s
 - Created a common site.yml playbook, into which the app, db, deploy playbooks are imported
 - Checked the work of the playbook site.yml on clean infrastructure
 
+## 12 - Ansible: roles nad environment
+
+- Created the app and db roles `ansible-galaxy init app`
+- Moved tasks, handlers, templates, variables to the roles (db, app)
+- Playbooks ansible/app.yml and ansible/db.yml redesigned to use roles instead of tasks
+- Executed ansible-playbook site.yml after redeployed infrastructure
+
+### Environments
+
+- Created directories for stage and prod environments
+- In ansible.cfg, the default inventory is `./Environments/stage/inventory`
+- Added group_vars directories to the environment directory
+- Moved variables from playbooks to corresponding group_vars files for stage and prod environments
+- Added `env:local` variable in defaults /main.yml for roles app and db
+- In the role of an add-on task that displays information about the environment used
+- Added an indication of the path to the directory with roles in ansible.cfg and the obligatory display of diff when changes are made
+
+### Working with community roles
+
+- Created requirements files for environments
+- Installed role jdauphant.nginx `ansible-galaxy install -r environments/stage/requirements.yml`
+- Added minimum proxy settings for the nginx role to group_vars for app hosts
+- Added creation of a rule for access to port 80 in the Terraform-module app
+- Added a call to the jdauphan.nginx role in the app.yml playbook
+- Applied playbook site.yml, made sure that the application is available on port 80
+
+### Working with Ansible Vault
+
+- Created vault.key file with password for Ansible Vault
+- Added vault_password_file parameter to ansible.cfg
+- Added playbook for creating users - users.yml
+- Added credentials.yml for environments
+- The credentials.yml files are encrypted
+- The users.yml playbook call is added to site.yml and applied to the stage environment
