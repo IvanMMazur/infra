@@ -97,13 +97,7 @@ $ gcloud compute firewall-rules create default-puma-server\
     --rules TCP:9292
 ```
 
-``` text
-testapp_IP = 34.66.131.215
-
-testapp_port = 9292
-```
-
-# HW7. Infrastructure management models.
+# Infrastructure management models.
 
 Setting Application Default Credentials(ADC)
 ``` text
@@ -111,7 +105,7 @@ gcloud auth application-default login
 ```
 
 Create an image with ruby and mongo, and the application is deployed via startup-script, for the VM to work continously, replace 'premptible' with 'restart-on-failure'
-- packer/imutable.sh
+- packer/imutable.json
 
 To transfer the file to the server use the utility
 ``` text
