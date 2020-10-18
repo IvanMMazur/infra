@@ -1,23 +1,23 @@
 terraform {
-  required_varsion = "0.11.14"
+  required_varsion = "0.11.11"
 }
 
 provider "google" {
   version = "2.0.0"
 
   # Project id
-  project = "keen-ripsaw-278820"
+  # project = "keen-ripsaw-278820"
   project = "${var.project}"
 
-  #region = "europe-west1"
+  # region = "europe-west1"
   region = "${var.region}"
 }
 
-resource "google_compute_project_metadata" "default" {
-  metadata {
-    ssh-keys = "appuser1:${file(var.public_key_path)} appuser2:${file(var.public_key_path)}"
-  }
-}
+# resource "google_compute_project_metadata" "default" {
+#   metadata {
+#     ssh-keys = "appuser1:${file(var.public_key_path)} appuser2:${file(var.public_key_path)}"
+#   }
+# }
 
 resource "google_compute_instance" "app" {
   name         = "reddit-app"
@@ -26,12 +26,14 @@ resource "google_compute_instance" "app" {
 
   boot_disk {
     initialize_params {
+      # image = "reddit-base"
       image = "${var.disk_image}"
     }
   }
 
   metadata {
-    ssh-keys = "ivanmazur:${file(var.public_key_path)}"
+    # ssh-keys = "appuser:${file("~/.ssh/appuser.pub")}"
+    ssh-keys = "appuser:${file(var.public_key_path)}"
   }
 
   tags = ["reddit-app"]
@@ -43,7 +45,7 @@ resource "google_compute_instance" "app" {
 
   connection {
     type        = "ssh"
-    user        = "ivanmazur"
+    user        = "appuser"
     agent       = false
     private_key = "${file(var.private_key_path)}"
   }
