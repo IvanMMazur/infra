@@ -1,6 +1,6 @@
 
 Infra repository
-# HW5. Introduction in GCP
+# Introduction in GCP
 
 IP addresses of virtual machines:
 
@@ -54,7 +54,7 @@ I made sure that it is possible to connect someinternalhost via int.IP
 
 Add cetrtificates letsencrypt
 
-# HW6. Main services GCP
+# Main services GCP
 
 Installation GCP according to the instructions
 - https://cloud.google.com/sdk/docs/
@@ -97,13 +97,7 @@ $ gcloud compute firewall-rules create default-puma-server\
     --rules TCP:9292
 ```
 
-``` text
-testapp_IP = 34.66.131.215
-
-testapp_port = 9292
-```
-
-## HW7. Infrastructure management models.
+## Infrastructure management models.
 
 Setting Application Default Credentials(ADC)
 ``` text
@@ -121,7 +115,7 @@ To transfer the file to the server use the utility
 Start instance from the baked image
 - config-sh/create-puma-vm.sh
 
-## HW8. Infrastructure as a Code (IaC).
+## Infrastructure as a Code (IaC).
 
 - Note: git is already installed in standard Ubuntu images.
 - Renoved ivanmazur SSH key from Compute Engine - Metadata - SSH keys
