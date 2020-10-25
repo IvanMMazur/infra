@@ -1,5 +1,5 @@
 terraform {
-  required_varsion = "0.11.14"
+  required_varsion = "0.11.11"
 }
 
 provider "google" {
