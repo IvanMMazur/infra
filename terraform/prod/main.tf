@@ -1,5 +1,5 @@
 terraform {
-  required_varsion = "0.11.14"
+  required_varsion = "0.11.11"
 }
 
 provider "google" {
@@ -29,7 +29,7 @@ module "db" {
 
 module "vpc" {
   source        = "../modules/vpc"
-  source_ranges = ["37.30.16.236/32"]
+  source_ranges = ["46.204.19.6/32"]
 }
 
 # resource "google_compute_project_metadata" "default" {

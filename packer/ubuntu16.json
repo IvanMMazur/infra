@@ -22,7 +22,7 @@
             "zone": "{{ user `my_zone` }}",
             "network": "default",
             "tags": "{{ user `my_net_tags` }}",
-            "ssh_username": "ivanmazur",
+            "ssh_username": "appuser",
             "machine_type": "{{ user `my_machine_type` }}"
         }
     ],
