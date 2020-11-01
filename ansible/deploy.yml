@@ -7,14 +7,14 @@
     - name: Fetch the latest version of application code
       git:
         repo: 'https://github.com/express42/reddit.git'
-        dest: /home/ivanmazur/reddit
+        dest: /home/appuser/reddit
         version: monolith
       notify: reload puma
     
     - name: bundle install
       bundler:
         state: present
-        chdir: /home/ivanmazur/reddit # <-- in which directory execute the command
+        chdir: /home/appuser/reddit # <-- in which directory execute the command
     
   handlers:
   - name: reload puma

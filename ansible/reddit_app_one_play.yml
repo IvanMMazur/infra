@@ -3,7 +3,7 @@
   hosts: all # <-- to which hosts will be performed task
   vars:
     mongo_bind_ip: 0.0.0.0
-    db_host: 10.132.0.18
+    db_host: 10.132.15.219
   tasks: # <-- block of tasks that will be performed for these hosts
     - name: Change mongo config file
       become: true # <-- run as root
@@ -13,7 +13,10 @@
         mode: 0644 # <-- file permissions to install
       tags: db-tag
       notify: restart mongod
-
+  # handlers:
+  #   - name: Change mongo config file
+  #     become: true
+  #     service: name=mongod state=restarted
     - name: Add unit file for Puma
       become: true
       copy: 
@@ -25,7 +28,7 @@
     - name: Add config for DB connection
       template:
         src: templates/db_config.j2
-        dest: /home/ivanmazur/db_config
+        dest: /home/appuser/db_config
       tags: app-tag
 
     - name: enable puma
@@ -36,7 +39,7 @@
     - name: Fetch the latest version of application code
       git:
         repo: 'https://github.com/express42/reddit.git'
-        dest: /home/ivanmazur/reddit
+        dest: /home/appuser/reddit
         version: monolith
       tags: deploy-tag
       notify: reload puma
@@ -44,7 +47,7 @@
     - name: Bundle install
       bundler:
         state: present
-        chdir: /home/ivanmazur/reddit # <-- in which directory execute the command
+        chdir: /home/appuser/reddit # <-- in which directory execute the command
       tags: deploy-tag
       
   handlers:
