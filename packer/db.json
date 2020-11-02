@@ -1,13 +1,13 @@
 {
     "variables": {
-        "my_project_id": null,
+        "my_project_id": "",
         "my_image_description": "reddit-db-base",
-        "my_source_image_family": null,
-        "my_machine_type": null,
-        "my_disk_size": null,
-        "my_disk_type": null,
-        "my_zone": null,
-        "my_net_tags": null
+        "my_source_image_family": "",
+        "my_machine_type": "",
+        "my_disk_size": "10",
+        "my_disk_type": "pd-standard",
+        "my_zone": "europe-west1-c",
+        "my_net_tags": ""
     },
     "builders": [
         {
@@ -22,15 +22,14 @@
             "zone": "{{ user `my_zone` }}",
             "network": "default",
             "tags": "{{ user `my_net_tags` }}",
-            "ssh_username": "ivanmazur",
+            "ssh_username": "appuser",
             "machine_type": "{{ user `my_machine_type` }}"
         }
     ],
     "provisioners": [
         {
-            "type": "shell",
-            "script": "scripts/install_mongodb.sh",
-            "execute_command": "sudo {{.Path}}"
+            "type": "ansible",
+            "playbook_file": "ansible/packer_db.yml"
         }
     ]
 }
