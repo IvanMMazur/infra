@@ -2,11 +2,13 @@
 - name: Install Ruby && Bundler
   host: all
   become: true
-  tasks:
-  # Install all dependencies in the loop
-  - name: Install ruby and rubygems and required packages
-    apt: "name={{ item }} state=present"
-    with_items:
-      - ruby-full
-      - ruby-bundler
-      - byild-essential
+  roles: 
+    - app
+  # tasks:
+  # # Install all dependencies in the loop
+  # - name: Install ruby and rubygems and required packages
+  #   apt: "name={{ item }} state=present"
+  #   with_items:
+  #     - ruby-full
+  #     - ruby-bundler
+  #     - byild-essential

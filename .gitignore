@@ -10,3 +10,11 @@ packer/variables.json
 *.retry
 vault.key
 jdauphant.nginx
+# Vagrant & molecule
+.vagrant/
+*.log
+*.pyc
+.molecule
+.cache
+.pytest_cache
+db1/*

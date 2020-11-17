@@ -384,3 +384,37 @@ appserver                  : ok=2    changed=1    unreachable=0    failed=0    s
 - Added credentials.yml for environments
 - The credentials.yml files are encrypted
 - The users.yml playbook call is added to site.yml and applied to the stage environment
+
+## 13 - Vagrant Molecule Testinfra
+
+- An ansible-provider for vm dbserver added to Vagrantfile
+- mongoDB settings removed from main.yml Step into a separate file ./ansible/roles/db/tasks/config_mongo.yml
+- Added the puma.yml file describing the puma-server configuration ansible>roles>app>tasks
+- Unit-file puma.service converted to jinja template
+
+
+- In order for nginx to proxy requests to the application, settings have been added to the vagrantfile in the same way as it was configured in ./ansible/group_vars/app
+
+<details>
+    <summary>nginx options</summary>
+
+...
+   ansible.extra_vars = {"deploy_user" => "vagrant",
+          "nginx_sites" => {
+            "default" => [
+              "listen 80 default_server",
+              "server_name reddit",
+              "location / { proxy_pass http://127.0.0.1:9292; }"
+            ]
+          }
+...
+
+### Role testing
+
+- molecule<3.0
+- Test template: "molecule init scenario --scenario-name default -r db -d vagrant"
+- Added tests to ./ansible/roles/db/molecule/default/tests/test_default.py
+- Added test machine description in ./ansible/roles/db/molecule/default/molecule.yml
+- Created VM via "molecule create"
+- Applied instance configuration via molecule converge
+- Run tests via molecule verify and make sure they work

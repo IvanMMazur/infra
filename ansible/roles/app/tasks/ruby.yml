@@ -1,0 +1,13 @@
+---
+- name: Install ruby and rubygems and required packages
+  become: true
+  apt:
+    name: "{{ item }}" 
+    state: present
+  # allow_unauthenticated: yes
+  with_items:
+    - ruby-full
+    - ruby-bundler
+    - build-essential
+  tags: ruby
+  # tipa apt eto modul ansible i dalshe tut kopat s komandami
